@@ -46,7 +46,7 @@ class User(UserMixin, db.Model):
     comments = relationship("Comment", back_populates="comment_author")
 
 
-db.create_all()
+# db.create_all()
 
 
 class BlogPost(db.Model, UserMixin):
@@ -62,7 +62,7 @@ class BlogPost(db.Model, UserMixin):
     comments = relationship("Comment", back_populates="parent_post")
 
 
-db.create_all()
+# db.create_all()
 
 
 class Comment(UserMixin, db.Model):
@@ -77,7 +77,7 @@ class Comment(UserMixin, db.Model):
     parent_post = relationship("BlogPost", back_populates="comments")
 
 
-db.create_all()
+# db.create_all()
 
 
 def admin_only(function):
