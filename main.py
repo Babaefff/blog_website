@@ -12,16 +12,16 @@ from functools import wraps
 from sqlalchemy.ext.declarative import declarative_base
 import re
 import os
-uri = os.getenv("DATABASE_URL")  # or other relevant config var
-if uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 ckeditor = CKEditor(app)
 Bootstrap(app)
-
+uri = os.getenv("DATABASE_URL")  # or other relevant config var
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
 ##CONNECT TO DB
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(uri,"sqlite:///blog.db")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(uri, "sqlite:///blog.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -36,7 +36,6 @@ gravatar = Gravatar(app,
                     use_ssl=False,
                     base_url=None,
                     )
-
 
 
 class User(UserMixin, db.Model):
@@ -81,7 +80,7 @@ class Comment(UserMixin, db.Model):
     parent_post = relationship("BlogPost", back_populates="comments")
 
 
-# db.create_all()
+db.create_all()
 
 
 def admin_only(function):
@@ -90,7 +89,6 @@ def admin_only(function):
         if not current_user.is_authenticated or current_user.id != 1:
             return abort(403)
         return function(*args, *kwargs)
-
     return decorated_function
 
 
@@ -151,7 +149,7 @@ def logout():
     return redirect(url_for('get_all_posts'))
 
 
-@app.route("/post/<int:post_id>",methods=["GET",'POST'])
+@app.route("/post/<int:post_id>", methods=["GET", 'POST'])
 def show_post(post_id):
     form = CommentForm()
     requested_post = BlogPost.query.get(post_id)
@@ -160,17 +158,15 @@ def show_post(post_id):
             flash("We need to login or register")
             return redirect(url_for('login'))
         new_comment = Comment(
-            text = form.body.data,
-            parent_post = requested_post,
-            comment_author = current_user
+            text=form.body.data,
+            parent_post=requested_post,
+            comment_author=current_user
 
         )
         db.session.add(new_comment)
         db.session.commit()
 
     return render_template("post.html", form=form, post=requested_post)
-
-
 
 
 @app.route("/about")
